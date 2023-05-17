@@ -9,6 +9,15 @@ import Foundation
 import CoreGraphics
 import MetalKit
 
+/*
+ 
+Metal function should be one input and one output texture
+ 
+kernel void function_name(texture2d<half, access::read>  inTexture  [[ texture(0) ]],
+                          texture2d<half, access::write> outTexture [[ texture(1) ]],
+                          uint2                          gid        [[ thread_position_in_grid ]]) {
+*/
+
 public extension CGImage {
     
     func metal(function: String, bundle: Bundle, outFormat: TBMetalImageOutputFormat = .rgba) throws -> CGImage {
