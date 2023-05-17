@@ -1,5 +1,5 @@
 //
-//  TBEmbossAlphaError.swift
+//  TBMetalImageError.swift
 //  
 //
 //  Created by Todd Bowden on 5/13/23.
