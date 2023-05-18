@@ -33,13 +33,16 @@ public extension MTLCommandBuffer {
         }
         commandEncoder.setTexture(outTexture, index: inTextures.count)
     
-        // Threadgroups
-        let s = computePipelineState.maxTotalThreadsPerThreadgroup < 1024 ? 16 : 32
-        let threadsPerGrid = MTLSize(width: s, height: s, depth: 1)
-        let tw = (outTexture.width  + threadsPerGrid.width - 1) / threadsPerGrid.width
-        let th = (outTexture.height + threadsPerGrid.height - 1) / threadsPerGrid.height
-        let threadsPerThreadgroup = MTLSize(width: tw, height: th, depth: 1)
-        commandEncoder.dispatchThreadgroups(threadsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
+        // Threadgroups        
+        let w = computePipelineState.threadExecutionWidth
+        let h = computePipelineState.maxTotalThreadsPerThreadgroup / w
+        let threadsPerThreadgroup = MTLSizeMake(w, h, 1)
+        
+        let threadgroupsPerGrid = MTLSize(width: (outTexture.width + w - 1) / w,
+                                          height: (outTexture.height + h - 1) / h,
+                                          depth: 1)
+        
+        commandEncoder.dispatchThreadgroups(threadgroupsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
         
         commandEncoder.endEncoding()
     }
