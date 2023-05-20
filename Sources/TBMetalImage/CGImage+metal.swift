@@ -20,18 +20,29 @@ kernel void function_name(texture2d<half, access::read>  inTexture  [[ texture(0
 
 public extension CGImage {
     
-    func metal(function: String, bundle: Bundle, outFormat: TBMetalImageOutputFormat = .rgba, outWidth: Int? = nil, outHeight: Int? = nil) throws -> CGImage {
+    func metal(function: String,
+               bundle: Bundle,
+               images: [CGImage] = [],
+               outFormat: TBMetalImageOutputFormat = .rgba,
+               outWidth: Int? = nil,
+               outHeight: Int? = nil) throws -> CGImage {
+        
         let commandBuffer = try TBMakeMetalCommandBuffer.makeDefault()
         let device = commandBuffer.device
         
         // Create textures
         let loader = MTKTextureLoader(device: device)
         let selfTexture = try loader.newTexture(cgImage: self)
+        var inTextures = [selfTexture]
+        for image in images {
+            let texture = try loader.newTexture(cgImage: image)
+            inTextures.append(texture)
+        }
         let w = outWidth ?? selfTexture.width
         let h = outHeight ?? selfTexture.height
         let outTexture = try device.emptyTexture(width: w, height: h, format: outFormat.mtlPixelFormat)
         
-        try commandBuffer.encode(function, bundle: bundle, inTexture: selfTexture, outTexture: outTexture)
+        try commandBuffer.encode(function, bundle: bundle, inTextures: inTextures, outTexture: outTexture)
         
         // Commit and wait
         commandBuffer.commit()
