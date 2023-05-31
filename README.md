@@ -1,3 +1,3 @@
 # TBMetalImage
 
-A description of this package.
+Processing images using Metal
