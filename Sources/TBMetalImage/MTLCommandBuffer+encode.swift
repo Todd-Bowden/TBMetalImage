@@ -10,11 +10,11 @@ import MetalKit
 
 public extension MTLCommandBuffer {
     
-    func encode(_ funcName: String, bundle: Bundle, inTexture: MTLTexture, outTexture: MTLTexture) throws {
-        try self.encode(funcName, bundle: bundle, inTextures: [inTexture], outTexture: outTexture)
+    func encode(_ funcName: String, bundle: Bundle, inTexture: MTLTexture, outTexture: MTLTexture, buffer: MTLBuffer? = nil) throws {
+        try self.encode(funcName, bundle: bundle, inTextures: [inTexture], outTexture: outTexture, buffer: buffer)
     }
     
-    func encode(_ funcName: String, bundle: Bundle, inTextures: [MTLTexture], outTexture: MTLTexture) throws {
+    func encode(_ funcName: String, bundle: Bundle, inTextures: [MTLTexture], outTexture: MTLTexture, buffer: MTLBuffer? = nil) throws {
         // Get the function
         let library = try device.makeDefaultLibrary(bundle: bundle)
         guard let function = library.makeFunction(name: funcName) else {
@@ -32,6 +32,11 @@ public extension MTLCommandBuffer {
             commandEncoder.setTexture(inTextures[i], index: i)
         }
         commandEncoder.setTexture(outTexture, index: inTextures.count)
+        
+        // Add optional buffer to the command encoder
+        if let buffer {
+            commandEncoder.setBuffer(buffer, offset: 0, index: inTextures.count + 1)
+        }
     
         // Threadgroups        
         let w = computePipelineState.threadExecutionWidth
