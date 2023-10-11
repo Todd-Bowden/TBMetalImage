@@ -16,4 +16,5 @@ public enum TBMetalImageError: Error {
     case errorCreatingMTLCommandBuffer
     case errorCreatingMTLFunction(String)
     case errorCreatingMTLComputeCommandEncoder
+    case errorCreatingDataBuffer
 }

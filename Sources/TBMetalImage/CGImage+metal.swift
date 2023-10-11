@@ -23,6 +23,7 @@ public extension CGImage {
     func metal(function: String,
                bundle: Bundle,
                images: [CGImage] = [],
+               data: Data? = nil,
                outFormat: TBMetalImageOutputFormat = .rgba,
                outWidth: Int? = nil,
                outHeight: Int? = nil) throws -> CGImage {
@@ -42,7 +43,18 @@ public extension CGImage {
         let h = outHeight ?? selfTexture.height
         let outTexture = try device.emptyTexture(width: w, height: h, format: outFormat.mtlPixelFormat)
         
-        try commandBuffer.encode(function, bundle: bundle, inTextures: inTextures, outTexture: outTexture)
+        var buffer: MTLBuffer? = nil
+        if let data {
+            try data.withUnsafeBytes { rawBufferPointer in
+                if let pointer = rawBufferPointer.baseAddress {
+                    buffer = device.makeBuffer(bytes: pointer, length: data.count)
+                } else {
+                    throw TBMetalImageError.errorCreatingDataBuffer
+                }
+            }
+        }
+        
+        try commandBuffer.encode(function, bundle: bundle, inTextures: inTextures, outTexture: outTexture, buffer: buffer)
         
         // Commit and wait
         commandBuffer.commit()
