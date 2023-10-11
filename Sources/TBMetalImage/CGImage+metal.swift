@@ -22,6 +22,17 @@ public extension CGImage {
     
     func metal(function: String,
                bundle: Bundle,
+               image: CGImage,
+               data: Data? = nil,
+               outFormat: TBMetalImageOutputFormat = .rgba,
+               outWidth: Int? = nil,
+               outHeight: Int? = nil) throws -> CGImage {
+        
+        try metal(function: function, bundle: bundle, images: [image], data: data, outFormat: outFormat, outWidth: outWidth, outHeight: outHeight)
+    }
+    
+    func metal(function: String,
+               bundle: Bundle,
                images: [CGImage] = [],
                data: Data? = nil,
                outFormat: TBMetalImageOutputFormat = .rgba,
