@@ -33,9 +33,11 @@ public extension MTLCommandBuffer {
         }
         commandEncoder.setTexture(outTexture, index: inTextures.count)
         
-        // Add optional buffer to the command encoder
+        // Add optional buffer and length to the command encoder
         if let buffer {
             commandEncoder.setBuffer(buffer, offset: 0, index: inTextures.count + 1)
+            var bufferLength: UInt32 = UInt32(buffer.length)
+            commandEncoder.setBytes(&bufferLength, length: 4, index: inTextures.count + 2)
         }
     
         // Threadgroups        
